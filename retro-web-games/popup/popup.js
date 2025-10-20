@@ -5,6 +5,7 @@ console.log('[RWG][popup] Loaded popup.js');
 
 const pinInput = document.getElementById('pin');
 const saveBtn = document.getElementById('savePin');
+const startGameBtn = document.getElementById('startGame');
 const testOverlayBtn = document.getElementById('testOverlay');
 const pinStatus = document.getElementById('pinStatus');
 const openSwLogsBtn = document.getElementById('openSwLogs');
@@ -37,6 +38,29 @@ async function savePin() {
   } catch (err) {
     console.error('[RWG][popup] Failed to save PIN', err);
     pinStatus.textContent = 'Error saving PIN (see console).';
+  }
+}
+
+async function startGame() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab || !tab.id) {
+      pinStatus.textContent = 'No active tab found.';
+      return;
+    }
+    // Some URLs (chrome://, chromewebstore) disallow content scripts
+    const url = tab.url || '';
+    if (url.startsWith('chrome://') || url.startsWith('edge://') || url.startsWith('about:') || url.startsWith('chrome-extension://')) {
+      pinStatus.textContent = 'Cannot inject into this page. Try a normal website.';
+      return;
+    }
+    console.log('[RWG][popup] Starting game on tab', tab.id);
+    const response = await chrome.tabs.sendMessage(tab.id, { type: 'RWG_START_GAME' });
+    console.log('[RWG][popup] Game response:', response);
+    pinStatus.textContent = 'Game started! Press Esc to close.';
+  } catch (err) {
+    console.error('[RWG][popup] Error starting game', err);
+    pinStatus.textContent = 'Game start failed (see console).';
   }
 }
 
@@ -76,6 +100,7 @@ async function openServiceWorkerLogs() {
 
 document.addEventListener('DOMContentLoaded', loadPin);
 saveBtn.addEventListener('click', savePin);
+startGameBtn.addEventListener('click', startGame);
 testOverlayBtn.addEventListener('click', testOverlay);
 openSwLogsBtn.addEventListener('click', openServiceWorkerLogs);
 
