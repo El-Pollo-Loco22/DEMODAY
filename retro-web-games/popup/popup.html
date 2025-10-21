@@ -23,15 +23,27 @@
 
     <section>
       <button id="startGame">Start Game</button>
-      <button id="testOverlay">Test Overlay on Current Page</button>
       <div class="hint">Press Esc to close overlay</div>
+    </section>
+
+    <hr />
+
+    <section>
+      <h2>Slack</h2>
+      <label for="slackWebhook">Incoming Webhook URL</label>
+      <input id="slackWebhook" type="url" placeholder="https://hooks.slack.com/services/..." />
+      <div>
+        <button id="saveSlack">Save Slack URL</button>
+        <button id="testSlack">Send Test to Slack</button>
+      </div>
+      <div class="hint" id="slackStatus"></div>
     </section>
 
     <footer>
       <button id="openSwLogs">Open Service Worker Logs</button>
     </footer>
 
-    <script src="popup.js"></script>
+    <script type="module" src="popup.js"></script>
   </body>
   </html>
 
